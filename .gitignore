@@ -1,0 +1,10 @@
+data/raw/
+data/processed/
+*.csv
+*.gz
+.DS_Store
+.idea/
+venv/
+__pycache__/
+*.pyc
+*.zip
