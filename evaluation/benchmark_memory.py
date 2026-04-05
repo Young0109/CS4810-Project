@@ -1,0 +1,64 @@
+import sys
+import os
+import tracemalloc
+import matplotlib.pyplot as plt
+
+sys.path.insert(0, '/Users/sun/CS4810-Project')
+
+from src.bloom_filter import BloomFilter
+from src.hyperloglog import HyperLogLog
+
+# ── Generate synthetic IPs for benchmarking ──
+def generate_ips(n):
+    ips = []
+    for i in range(n):
+        a = (i >> 24) & 0xFF
+        b = (i >> 16) & 0xFF
+        c = (i >> 8) & 0xFF
+        d = i & 0xFF
+        ips.append(f"{a}.{b}.{c}.{d}")
+    return ips
+
+sizes = [10000, 50000, 100000, 250000, 500000, 750000, 1000000]
+
+system1_memory = []
+system2_memory = []
+
+for n in sizes:
+    ips = generate_ips(n)
+
+    # ── System 1: exact baseline (Python set) ──
+    tracemalloc.start()
+    exact = set()
+    for ip in ips:
+        exact.add(ip)
+    _, peak1 = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    system1_memory.append(peak1 / 1024 / 1024)  # convert to MB
+
+    # ── System 2: probabilistic (Bloom filter + HyperLogLog) ──
+    tracemalloc.start()
+    bf = BloomFilter(n=n, p=0.01)
+    hll = HyperLogLog(b=10)
+    for ip in ips:
+        bf.insert(ip)
+        hll.add(ip)
+    _, peak2 = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    system2_memory.append(peak2 / 1024 / 1024)  # convert to MB
+
+    print(f"n={n:>8,} | System 1: {system1_memory[-1]:.2f}MB | System 2: {system2_memory[-1]:.2f}MB")
+
+# ── Plot ──
+plt.figure(figsize=(10, 6))
+plt.plot(sizes, system1_memory, marker='o', label='System 1 — Exact (Python set)', color='#E24B4A', linewidth=2)
+plt.plot(sizes, system2_memory, marker='s', label='System 2 — Probabilistic (Bloom + HLL)', color='#1D9E75', linewidth=2)
+plt.xlabel('Number of unique IPs')
+plt.ylabel('Peak memory usage (MB)')
+plt.title('Memory Usage: Exact Baseline vs Probabilistic Pipeline')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('evaluation/memory_benchmark.png', dpi=150)
+plt.show()
+print("Plot saved to evaluation/memory_benchmark.png")
