@@ -6,6 +6,8 @@ sys.path.insert(0, '/Users/sun/CS4810-Project')
 
 from src.bloom_filter import BloomFilter
 from src.hyperloglog import HyperLogLog
+from src.baseline_system import ExactBaseline
+
 
 def generate_ips(n):
     ips = []
@@ -17,6 +19,7 @@ def generate_ips(n):
         ips.append(f"{a}.{b}.{c}.{d}")
     return ips
 
+
 sizes = [10000, 50000, 100000, 250000, 500000, 750000, 1000000]
 
 system1_throughput = []
@@ -25,15 +28,15 @@ system2_throughput = []
 for n in sizes:
     ips = generate_ips(n)
 
-    # ── System 1: exact baseline ──
-    exact = set()
+    # ── System 1: ExactBaseline ──
+    baseline = ExactBaseline()
     start = time.perf_counter()
     for ip in ips:
-        exact.add(ip)
+        baseline.update(ip)
     elapsed1 = time.perf_counter() - start
     system1_throughput.append(n / elapsed1)
 
-    # ── System 2: probabilistic ──
+    # ── System 2: Bloom filter + HyperLogLog ──
     bf = BloomFilter(n=n, p=0.01)
     hll = HyperLogLog(b=10)
     start = time.perf_counter()
@@ -45,9 +48,8 @@ for n in sizes:
 
     print(f"n={n:>8,} | System 1: {system1_throughput[-1]:,.0f} ops/sec | System 2: {system2_throughput[-1]:,.0f} ops/sec")
 
-# ── Plot ──
 plt.figure(figsize=(10, 6))
-plt.plot(sizes, system1_throughput, marker='o', label='System 1 — Exact (Python set)', color='#E24B4A', linewidth=2)
+plt.plot(sizes, system1_throughput, marker='o', label='System 1 — Exact (ExactBaseline)', color='#E24B4A', linewidth=2)
 plt.plot(sizes, system2_throughput, marker='s', label='System 2 — Probabilistic (Bloom + HLL)', color='#1D9E75', linewidth=2)
 plt.xlabel('Number of unique IPs')
 plt.ylabel('Throughput (operations per second)')
