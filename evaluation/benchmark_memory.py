@@ -1,8 +1,8 @@
+import os
 import sys
 import tracemalloc
 import matplotlib.pyplot as plt
-
-sys.path.insert(0, '/Users/sun/CS4810-Project')
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.bloom_filter import BloomFilter
 from src.hyperloglog import HyperLogLog

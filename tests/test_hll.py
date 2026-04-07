@@ -1,16 +1,18 @@
+import os
 import sys
-sys.path.insert(0, '/Users/sun/CS4810-Project')
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.hyperloglog import HyperLogLog
 from src.log_parser import stream_nasa_logs, stream_cic_logs
 
-BASE = '/Users/sun/CS4810-Project/data/raw'
+BASE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'raw')
 
 print("=== HyperLogLog on NASA logs ===")
 hll = HyperLogLog(b=10)
 count = 0
 exact = set()
-for entry in stream_nasa_logs(f"{BASE}/NASA_access_log_Jul95"):
+for entry in stream_nasa_logs(os.path.join(BASE, 'NASA_access_log_Jul95')):
     hll.add(entry.ip)
     exact.add(entry.ip)
     count += 1
@@ -25,7 +27,7 @@ print(f"Equivalent Python set: ~{len(exact) * 50} bytes")
 print("\n=== HyperLogLog on CIC SYN flood ===")
 hll2 = HyperLogLog(b=10)
 exact2 = set()
-for entry in stream_cic_logs(f"{BASE}/01-12/Syn.csv"):
+for entry in stream_cic_logs(os.path.join(BASE, '01-12', 'Syn.csv')):
     hll2.add(entry.ip)
     exact2.add(entry.ip)
 

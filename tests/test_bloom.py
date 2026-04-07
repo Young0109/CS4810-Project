@@ -1,14 +1,16 @@
+import os
 import sys
-sys.path.insert(0, '/Users/sun/CS4810-Project')
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.log_parser import stream_nasa_logs, stream_cic_logs
 from src.bloom_filter import BloomFilter
 
-BASE = '/Users/sun/CS4810-Project/data/raw'
+BASE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'raw')
 
 print("=== Building whitelist from NASA logs ===")
 whitelist_ips = []
-for entry in stream_nasa_logs(f"{BASE}/NASA_access_log_Jul95"):
+for entry in stream_nasa_logs(os.path.join(BASE, 'NASA_access_log_Jul95')):
     whitelist_ips.append(entry.ip)
 
 whitelist = BloomFilter(n=len(whitelist_ips), p=0.01)
@@ -22,7 +24,7 @@ print(f"Memory used: {whitelist.memory_bytes()} bytes")
 
 print("\n=== Building blacklist from CIC SYN flood ===")
 blacklist_ips = []
-for entry in stream_cic_logs(f"{BASE}/01-12/Syn.csv"):
+for entry in stream_cic_logs(os.path.join(BASE, '01-12', 'Syn.csv')):
     if entry.is_attack:
         blacklist_ips.append(entry.ip)
 
