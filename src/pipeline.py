@@ -1,10 +1,13 @@
 import math
-from log_parser import LogEntry
-from bloom_filter import BloomFilter
-from hyperloglog import HyperLogLog
-from count_min_sketch import CountMinSketch
-from misra_gries import MisraGries
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from src.log_parser import LogEntry
+from src.bloom_filter import BloomFilter
+from src.hyperloglog import HyperLogLog
+from src.count_min_sketch import CountMinSketch
+from src.misra_gries import MisraGries
 
 class System2Pipeline:
     def __init__(self, expected_n=2000000, p=0.01, epsilon=0.001):

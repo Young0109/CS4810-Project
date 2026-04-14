@@ -1,12 +1,15 @@
 import os
+import sys
 import time
-from log_parser import stream_cic_logs
-from pipeline import System2Pipeline
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.log_parser import stream_cic_logs
+from src.pipeline import System2Pipeline
 
 
 def main():
     pipeline = System2Pipeline(expected_n=5000000, epsilon=0.001)
-    data_path = os.path.join('..', 'data', 'high_cardinality.csv')
+    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'high_cardinality.csv')
 
     if not os.path.exists(data_path):
         print(f"Error: Could not find {data_path}")
