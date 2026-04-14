@@ -9,7 +9,7 @@ from src.pipeline import System2Pipeline
 
 def main():
     pipeline = System2Pipeline(expected_n=5000000, epsilon=0.001)
-    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'high_cardinality.csv')
+    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'raw', '01-12', 'Syn.csv')
 
     if not os.path.exists(data_path):
         print(f"Error: Could not find {data_path}")
