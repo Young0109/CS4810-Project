@@ -7,6 +7,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.bloom_filter import BloomFilter
 from src.hyperloglog import HyperLogLog
 from src.baseline_system import ExactBaseline
+from src.pipeline import System2Pipeline
+from src.log_parser import LogEntry
 
 
 def generate_ips(n):
@@ -37,13 +39,12 @@ for n in sizes:
     tracemalloc.stop()
     system1_memory.append(peak1 / 1024 / 1024)
 
-    # ── System 2: Bloom filter + HyperLogLog ──
+    # ── System 2: Full System2Pipeline ──
     tracemalloc.start()
-    bf = BloomFilter(n=n, p=0.01)
-    hll = HyperLogLog(b=10)
+    pipeline = System2Pipeline(expected_n=n, epsilon=0.001)
     for ip in ips:
-        bf.insert(ip)
-        hll.add(ip)
+        entry = LogEntry(ip=ip, timestamp=0.0, method=None, url=None, status=None, bytes_transferred=0, is_attack=False, label='BENIGN')
+        pipeline.process_entry(entry)
     _, peak2 = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     system2_memory.append(peak2 / 1024 / 1024)
@@ -52,7 +53,7 @@ for n in sizes:
 
 plt.figure(figsize=(10, 6))
 plt.plot(sizes, system1_memory, marker='o', label='System 1 — Exact (ExactBaseline)', color='#E24B4A', linewidth=2)
-plt.plot(sizes, system2_memory, marker='s', label='System 2 — Probabilistic (Bloom + HLL)', color='#1D9E75', linewidth=2)
+plt.plot(sizes, system2_memory, marker='s', label='System 2 — Full Probabilistic Pipeline', color='#1D9E75', linewidth=2)
 plt.xlabel('Number of unique IPs')
 plt.ylabel('Peak memory usage (MB)')
 plt.title('Memory Usage: Exact Baseline vs Probabilistic Pipeline')
