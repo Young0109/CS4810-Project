@@ -8,26 +8,18 @@ class BloomFilter:
     def __init__(self, n, p=0.01):
         self.n = n
         self.p = p
-        self.m = self._optimal_m(n, p)
-        self.k = self._optimal_k(self.m, n)
+        self.m = math.ceil(-n * math.log(p) / (math.log(2) ** 2))
+        self.k = math.ceil((self.m / n) * math.log(2))
         self.bit_array = bitarray(self.m)
         self.bit_array.setall(0)
 
-    def _optimal_m(self, n, p):
-        return math.ceil(-n * math.log(p) / (math.log(2) ** 2))
-
-    def _optimal_k(self, m, n):
-        return math.ceil((m / n) * math.log(2))
-
     def insert(self, ip):
         for seed in range(self.k):
-            index = mmh3.hash(ip, seed) % self.m
-            self.bit_array[index] = 1
+            self.bit_array[mmh3.hash(ip, seed) % self.m] = 1
 
     def query(self, ip):
         for seed in range(self.k):
-            index = mmh3.hash(ip, seed) % self.m
-            if not self.bit_array[index]:
+            if not self.bit_array[mmh3.hash(ip, seed) % self.m]:
                 return False
         return True
 

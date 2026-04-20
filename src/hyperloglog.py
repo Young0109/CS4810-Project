@@ -1,5 +1,5 @@
-import mmh3
 import math
+import mmh3
 
 
 class HyperLogLog:
@@ -8,17 +8,16 @@ class HyperLogLog:
         self.b = b
         self.m = 1 << b
         self.registers = [0] * self.m
-        self.alpha = self._get_alpha()
+        self.alpha = self._alpha()
 
-    def _get_alpha(self):
+    def _alpha(self):
         if self.m == 16:
             return 0.673
         elif self.m == 32:
             return 0.697
         elif self.m == 64:
             return 0.709
-        else:
-            return 0.7213 / (1 + 1.079 / self.m)
+        return 0.7213 / (1 + 1.079 / self.m)
 
     def _leading_zeros(self, bits, max_bits):
         if bits == 0:
@@ -32,17 +31,12 @@ class HyperLogLog:
 
     def add(self, ip):
         h = mmh3.hash(ip, signed=False)
-        register_index = h >> (32 - self.b)
-        remaining_bits = h & ((1 << (32 - self.b)) - 1)
-        leading = self._leading_zeros(remaining_bits, 32 - self.b)
-        self.registers[register_index] = max(
-            self.registers[register_index], leading
-        )
+        idx = h >> (32 - self.b)
+        rest = h & ((1 << (32 - self.b)) - 1)
+        self.registers[idx] = max(self.registers[idx], self._leading_zeros(rest, 32 - self.b))
 
     def estimate(self):
-        raw = self.alpha * self.m ** 2 * (
-            sum(2 ** -r for r in self.registers) ** -1
-        )
+        raw = self.alpha * self.m ** 2 * (sum(2 ** -r for r in self.registers) ** -1)
 
         if raw <= 2.5 * self.m:
             zeros = self.registers.count(0)
@@ -55,4 +49,4 @@ class HyperLogLog:
         return round(-(1 << 32) * math.log(1 - raw / (1 << 32)))
 
     def memory_bytes(self):
-        return self.m 
+        return self.m
