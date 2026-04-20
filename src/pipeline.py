@@ -16,7 +16,7 @@ class System2Pipeline:
                  window_size=60, spike_multiplier=3.0, freq_threshold=0.00001):
         self.whitelist = BloomFilter(n=expected_n, p=p)
         self.blacklist = BloomFilter(n=expected_n, p=p)
-        self.hll = HyperLogLog(b=12)
+        self.hll = HyperLogLog(b=10)
         self.cms = CountMinSketch(t=5, k=int(2 / epsilon))
         self.mg = MisraGries(k=int(1 / epsilon) - 1)
         self.window_manager = WindowManager(
