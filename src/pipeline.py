@@ -25,7 +25,7 @@ class System2Pipeline:
         self.cms = CountMinSketch(t=5, k=int(2 / epsilon))
 
         # ── Misra-Gries: heavy hitter detection ──
-        self.mg = MisraGries(k=int(1 / epsilon))
+        self.mg = MisraGries(k=int(1 / epsilon) - 1)
 
         # ── Window Manager: rolling time windows for spike detection ──
         self.window_manager = WindowManager(
