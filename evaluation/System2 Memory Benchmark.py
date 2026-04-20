@@ -2,20 +2,19 @@ import os
 import sys
 import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from src.log_parser import stream_cic_logs
 from src.pipeline import System2Pipeline
 
 
 def main():
     pipeline = System2Pipeline(expected_n=5000000, epsilon=0.001)
-    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'raw', '01-12', 'Syn.csv')
+    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'Syn.csv')
 
     if not os.path.exists(data_path):
         print(f"Error: Could not find {data_path}")
         return
 
-    print(f"Loading CIC-DDoS2019 dataset: {data_path}")
+    print(f"Running System 2 (DDoS Pipeline) on: {data_path}")
 
     start_time = time.time()
     limit = 500000
@@ -41,10 +40,10 @@ def main():
     print(f"Total Logs Processed:    {count}")
     print(f"Processing Time:         {duration:.2f} seconds")
     print(f"Throughput:              {count / duration:.2f} logs/sec")
-    print(f"Est. Unique IPs (HLL):   {report['estimated_unique_ips']}")
+    print(f"Est. Unique IPs:   {report['estimated_unique_ips']}")
     print(f"Pipeline Memory Usage:   {report['total_memory_kb']:.2f} KB")
 
-    print("\n[TOP ATTACKERS (Misra-Gries Heavy Hitters)]")
+    print("\n[TOP ATTACKERS]")
     heavy_hitters = pipeline.mg.get_heavy_hitters(phi=0.02, epsilon=0.001)
     if heavy_hitters:
         for hh in heavy_hitters:

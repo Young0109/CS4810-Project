@@ -2,7 +2,7 @@ import csv
 import random
 
 
-def generate_high_cardinality_data(filename, total_lines=1000000, unique_ips=500000):
+def generate_high_cardinality_data(filename, total_lines=1000000, unique_ips=1000000):
 
     ips = [f"{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}"
            for _ in range(unique_ips)]
@@ -22,5 +22,5 @@ def generate_high_cardinality_data(filename, total_lines=1000000, unique_ips=500
 if __name__ == "__main__":
     import os
 
-    data_path = os.path.join('..', 'data', 'high_cardinality.csv')
+    data_path = os.path.join('..', 'data', 'high_cardinality_1M.csv')
     generate_high_cardinality_data(data_path)

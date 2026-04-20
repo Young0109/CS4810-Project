@@ -10,7 +10,7 @@ from src.baseline_system import ExactBaseline
 
 def main():
     baseline = ExactBaseline()
-    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'high_cardinality.csv')
+    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'Syn.csv')
     if not os.path.exists(data_path):
         print(f"Error: Could not find {data_path}")
         return
